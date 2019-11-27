@@ -10,7 +10,7 @@ Fs = 100;
 t = linspace(0, N/Fs, N);
 
 %% Create signal
-s  = 300+256*sin(2*pi*20*t);
+s  = 300+256*sin(2*pi*40*t);
 
 %% DFT
 S = [];
@@ -27,6 +27,7 @@ S = abs(S);
 S = S/N*2;
 
 %% Calcualte frequencx vector
+%F = 0:127;
 F = linspace(0, Fs, N);
 
 %% Plot
