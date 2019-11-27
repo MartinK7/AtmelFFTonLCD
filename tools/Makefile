@@ -4,7 +4,7 @@ CFLAGS=#$(pkg-config cuda-10.1 --cflags)
 LIBS=#$(pkg-config cuda-10.1 --libs)
 
 all:
-	$(GCC) main.c -o $(TARGET)
+	$(GCC) main.c -o $(TARGET) -lm
 clean:
 	rm $(TARGET)
 run:

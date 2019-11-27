@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 int main(void) {
 
@@ -21,5 +22,19 @@ int main(void) {
 		if(!((i+1)%10) && i!=0)
 			printf("\n");
 	}
+	printf("\n\n");
+	uint32_t cnt = 0;
+	for(uint32_t m=0; m<bits; ++m) {
+		for(uint32_t k=0; k<(1<<m); ++k) {
+			uint32_t T = (2<<m);
+			float Fsin = sin((2*M_PI*(float)k)/(float)T);
+			float Fcos = cos((2*M_PI*(float)k)/(float)T);
+			printf("%5d, %5d, ", (int16_t)(Fsin*64.0f), (int16_t)(Fcos*64.0f));
+			++cnt;	
+			if(cnt%4==0 && cnt!=0) {
+				printf("\n");cnt=0;}
+		}
+	}
+
 	printf("\n");
 }
