@@ -23,32 +23,48 @@
 /* Define ------------------------------------------------------------*/
 
 uint8_t ADC_buffer[128];
-uint8_t ADC_bufferIndex;
+uint8_t ADC_bufferIndex = 0;
+//uint8_t ADC_done = 0;
 
-ISR(TIMER0_OVF_vect) {
-	//ADCSRA |= ADCSRA;
+ISR(ADC_vect) {
 	ADC_buffer[ADC_bufferIndex++] = ADCH;
-	ADCSRA |= ADSC;
-	if(!ADC_bufferIndex)
+	/*if(ADC_bufferIndex>=0x7F) {
+		ADC_bufferIndex = 0;
+		ADC_done = 1;
 		cli();
+	}*/
+	//while(!(ADCSRA & _BV(ADIF)));
+	/*if(ADC_bufferIndex>=129) {
+		ADC_bufferIndex = 0;
+		cli();
+	}*/
+
+	//ADCSRA &= ~_BV(ADIF);
+	//ADCSRA |= _BV(ADSC); // Start
 }
 
 void ADC_init() {
-     ADMUX  = 0b01000000;
+     ADMUX  = 0b01100000;
      ADMUX |= 0; //ADCx
-     ADCSRA = _BV(ADIE)|1;
-     ADCSRA |= _BV(ADEN); //ADC enable
+     ADCSRA = _BV(ADIE)|6;// 4 or 7
+     ADCSRA |= _BV(ADEN) | _BV(ADIE) | _BV(ADATE); //ADC enable, autotrigger
 
     //TIM_config_prescaler(TIM0, TIM_PRESC_8);
     //TIM_config_interrupt(TIM0, TIM_OVERFLOW_ENABLE);
 }
 
 void ADC_takeSpamples() {
-/*
-	ADC_bufferIndex = 1;
-	_delay_ms(10);
+	//ADC_done = 0;
+	sei();
+	ADCSRA |= _BV(ADSC); // Start
+	//while(!ADC_done);
+
+    //ADCSRA |= _BV(ADSC); // Start
+	//while(!ADC_bufferIndex);
+	//ADC_buffer[0] = ADCH;
+	//ADC_bufferIndex = 0;
+	//_delay_ms(10);
 	//sei();
-	while(!ADC_bufferIndex);*/
 }
 
 void plot(void) {
@@ -69,15 +85,24 @@ int main(void) {
 	LCD_init();
 
 	LCD_clear();
-	LCD_line(0, 0, 50, 50);
+	LCD_line(0, 0, 25, 25);
 	LCD_showBuffer();
 
 	ADC_init();
-	ADC_takeSpamples();
+	while(1) {
+		ADC_takeSpamples();
+		LCD_clear();
+		cli();
+		plot();
+		sei();
+		LCD_showBuffer();
+		_delay_ms(100);
+	}
 
-	LCD_clear();
-	plot();
-	LCD_showBuffer();
+	//ADC_takeSpamples();
+
+	//while(ADC_bufferIndex);
+
 
 	while(1);
 
