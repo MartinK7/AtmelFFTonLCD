@@ -57,7 +57,8 @@ LIBRARY_DIR = lib
 SRCS := main.c
 # Add or comment libraries you are using in the project
 SRCS += $(LIBRARY_DIR)/src/nokialcd.c
-#SRCS += $(LIBRARY_DIR)/src/uart.c
+SRCS += $(LIBRARY_DIR)/src/uart.c
+SRCS += $(LIBRARY_DIR)/src/fft.c
 #SRCS += $(LIBRARY_DIR)/src/twi.c
 #SRCS += $(LIBRARY_DIR)/src/gpio.c
 SRCS += $(LIBRARY_DIR)/src/timer.c

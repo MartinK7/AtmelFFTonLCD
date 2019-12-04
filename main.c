@@ -18,16 +18,18 @@
 #include <crazypinout.h>
 #include <nokialcd.h>
 #include <timer.h>
+#include <uart.h>
+#include <fft.h>
+#include <stdio.h>
 
 /* Typedef -----------------------------------------------------------*/
 /* Define ------------------------------------------------------------*/
 
-uint8_t ADC_buffer[128];
 uint8_t ADC_bufferIndex = 0;
 //uint8_t ADC_done = 0;
 
 ISR(ADC_vect) {
-	ADC_buffer[ADC_bufferIndex++] = ADCH;
+	// ADC_buffer[ADC_bufferIndex++] = ADCH;
 	/*if(ADC_bufferIndex>=0x7F) {
 		ADC_bufferIndex = 0;
 		ADC_done = 1;
@@ -69,19 +71,35 @@ void ADC_takeSpamples() {
 
 void plot(void) {
 	for(uint8_t x=1; x<84; ++x) {
-		LCD_line(x-1, 10+(ADC_buffer[x-1]>>3), x, 10+(ADC_buffer[x]>>3) );
+		//LCD_line(x-1, 10+(ADC_buffer[x-1]>>3), x, 10+(ADC_buffer[x]>>3) );
 	}
 }
 
 void stem(void) {
 	for(uint8_t x=0; x<84; ++x) {
-		LCD_line(x, LCDHEIGHT-1, x, LCDHEIGHT-1-(ADC_buffer[x]>>3) );
+		//LCD_line(x, LCDHEIGHT-1, x, LCDHEIGHT-1-(ADC_buffer[x]>>3) );
 	}
 }
 
 /* Variables ---------------------------------------------------------*/
 /* Function prototypes -----------------------------------------------*/
 int main(void) {
+    uart_init(UART_BAUD_SELECT(9600, F_CPU));
+	sei();
+	uart_puts("FFT START!!!!!\r\n");
+		FFT_calculate();
+	uart_puts("FFT END!!!!!\r\n");
+	TCplx *dat = FFT_getPtrData();
+	char text[64];
+    // Print all
+    for(uint8_t i=0; i<FFT_LENGHT; ++i) {
+        sprintf(text, "%4d\t%4d\r\n", (int16_t)dat[i].re, (int16_t)dat[i].im);
+		uart_puts(text);
+		_delay_ms(1);
+    }
+
+	while(1);
+
 	LCD_init();
 
 	LCD_clear();

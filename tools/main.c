@@ -35,6 +35,18 @@ int main(void) {
 				printf("\n");cnt=0;}
 		}
 	}
+	printf("\n\n");
+	for(uint32_t m=0; m<bits; ++m) {
+		for(uint32_t k=0; k<(1<<m); ++k) {
+			uint32_t T = (2<<m);
+			float Fsin = sin((2*M_PI*(float)k)/(float)T);
+			float Fcos = cos((2*M_PI*(float)k)/(float)T);
+			printf("%.4ff, %.4ff, ", (Fsin), (Fcos));
+			++cnt;	
+			if(cnt%4==0 && cnt!=0) {
+				printf("\n");cnt=0;}
+		}
+	}
 
 	printf("\n");
 }

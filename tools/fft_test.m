@@ -4,13 +4,13 @@ clear all;
 
 %% Parameters
 N = 128;
-Fs = 100;
+Fs = 1000;
 
 %% Time vector
 t = linspace(0, N/Fs, N);
 
 %% Create signal
-s  = 300+256*sin(2*pi*40*t);
+s  = 32+32*sin(2*pi*40*t);
 
 %% DFT
 S = [];
@@ -24,7 +24,7 @@ end
 
 %% Recalcualate values
 %S = abs(S);
-S = S/N*2;
+%S = S/N*2;
 
 %% Calcualte frequencx vector
 %F = 0:127;

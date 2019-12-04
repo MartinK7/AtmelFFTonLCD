@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <fft.h>
 
-#define FFT_LENGHT 128
-#define N 128
 
 // Swap
 const uint8_t bitswap[FFT_LENGHT] = {
@@ -48,11 +47,6 @@ const float TSinCos[FFT_LENGHT] = {
     0.0491f, -0.9988f
 };
 
-typedef struct{
-    float re;
-    float im;
-}TCplx;
-
 TCplx signal[128];
 
 void calbut(TCplx *A, TCplx *B, float sinus, float cosinus) {
@@ -66,13 +60,17 @@ void calbut(TCplx *A, TCplx *B, float sinus, float cosinus) {
     A->im=A->im + C.im;
 }
 
-void main() {
+TCplx* FFT_getPtrData() {
+    return signal;
+}
+
+void FFT_calculate() {
     float Fs = 1000.0f;
 
     // Generate signal + bitswap
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
         float temp = 32.0f+32.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i));
-        signal[bitswap[i]].re = temp;
+        signal[bitswap[i]].re = (int16_t)temp;
         signal[i].im = 0.0f;
     }
 
@@ -122,10 +120,5 @@ void main() {
         signal[i].im = 0.0f;
     }
     
-
-    // Print all
-    for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        printf("%4f\t%4f\n", signal[i].re, signal[i].im);
-    }
     
 }
