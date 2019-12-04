@@ -20,7 +20,8 @@ USBPORT   = /dev/ttyUSB0
 
 ## AVR 8-bit toolchain
 # https://www.microchip.com/mplab/avr-support/avr-and-arm-toolchains-c-compilers
-PREFIX = /usr#/opt/avr8-gnu-toolchain-linux_x86_64
+#PREFIX = /usr#/opt/avr8-gnu-toolchain-linux_x86_64
+PREFIX=/home/martin/Downloads/avr8-gnu-toolchain-linux_x86_64
 
 
 ##
@@ -125,6 +126,11 @@ $(TARGET).lss : $(TARGET).elf
 # Displays the sizes of sections inside binary file
 size : $(TARGET).elf
 	@$(SIZE) --format=avr --mcu=$(MCU) --radix=16 $<
+
+
+flashusbasp : $(TARGET).hex
+	@echo "Flashing program memory\t$<"
+	@$(AVRDUDE) -p $(MCU_DUDE) -c usbasp -U flash:w:$(TARGET).hex:i
 
 ## Rule for program flashing
 # https://www.nongnu.org/avrdude/user-manual/avrdude_4.html

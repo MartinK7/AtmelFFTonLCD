@@ -3,7 +3,6 @@
 #include <math.h>
 
 #define FFT_LENGHT 128
-#define N 128
 
 // Swap
 const uint8_t bitswap[FFT_LENGHT] = {
@@ -23,71 +22,59 @@ const uint8_t bitswap[FFT_LENGHT] = {
 };
 
 //64 bigger
-const float TSinCos[FFT_LENGHT] = {
-    0.0000f, 1.0000f, 0.0491f, 0.9988f, 0.0980f, 0.9952f, 
-    0.1467f, 0.9892f, 0.1951f, 0.9808f, 0.2430f, 0.9700f, 
-    0.2903f, 0.9569f, 0.3369f, 0.9415f, 0.3827f, 0.9239f, 
-    0.4276f, 0.9040f, 0.4714f, 0.8819f, 0.5141f, 0.8577f, 
-    0.5556f, 0.8315f, 0.5957f, 0.8032f, 0.6344f, 0.7730f, 
-    0.6716f, 0.7410f, 0.7071f, 0.7071f, 0.7410f, 0.6716f, 
-    0.7730f, 0.6344f, 0.8032f, 0.5957f, 0.8315f, 0.5556f, 
-    0.8577f, 0.5141f, 0.8819f, 0.4714f, 0.9040f, 0.4276f, 
-    0.9239f, 0.3827f, 0.9415f, 0.3369f, 0.9569f, 0.2903f, 
-    0.9700f, 0.2430f, 0.9808f, 0.1951f, 0.9892f, 0.1467f, 
-    0.9952f, 0.0980f, 0.9988f, 0.0491f, 1.0000f, 0.0000f, 
-    0.9988f, -0.0491f, 0.9952f, -0.0980f, 0.9892f, -0.1467f, 
-    0.9808f, -0.1951f, 0.9700f, -0.2430f, 0.9569f, -0.2903f, 
-    0.9415f, -0.3369f, 0.9239f, -0.3827f, 0.9040f, -0.4276f, 
-    0.8819f, -0.4714f, 0.8577f, -0.5141f, 0.8315f, -0.5556f, 
-    0.8032f, -0.5957f, 0.7730f, -0.6344f, 0.7410f, -0.6716f, 
-    0.7071f, -0.7071f, 0.6716f, -0.7410f, 0.6344f, -0.7730f, 
-    0.5957f, -0.8032f, 0.5556f, -0.8315f, 0.5141f, -0.8577f, 
-    0.4714f, -0.8819f, 0.4276f, -0.9040f, 0.3827f, -0.9239f, 
-    0.3369f, -0.9415f, 0.2903f, -0.9569f, 0.2430f, -0.9700f, 
-    0.1951f, -0.9808f, 0.1467f, -0.9892f, 0.0980f, -0.9952f, 
-    0.0491f, -0.9988f
-};
+const int8_t TSinCos[FFT_LENGHT] = {   0,    64, 
+    3,    63,     6,    63,     9,    63,    12,    62, 
+   15,    62,    18,    61,    21,    60,    24,    59, 
+   27,    57,    30,    56,    32,    54,    35,    53, 
+   38,    51,    40,    49,    42,    47,    45,    45, 
+   47,    42,    49,    40,    51,    38,    53,    35, 
+   54,    32,    56,    30,    57,    27,    59,    24, 
+   60,    21,    61,    18,    62,    15,    62,    12, 
+   63,     9,    63,     6,    63,     3,    64,     0, 
+   63,    -3,    63,    -6,    63,    -9,    62,   -12, 
+   62,   -15,    61,   -18,    60,   -21,    59,   -24, 
+   57,   -27,    56,   -30,    54,   -32,    53,   -35, 
+   51,   -38,    49,   -40,    47,   -42,    45,   -45, 
+   42,   -47,    40,   -49,    38,   -51,    35,   -53, 
+   32,   -54,    30,   -56,    27,   -57,    24,   -59, 
+   21,   -60,    18,   -61,    15,   -62,    12,   -62, 
+    9,   -63,     6,   -63,     3,   -63};
 
 typedef struct{
-    float re;
-    float im;
+    int16_t re;
+    int16_t im;
 }TCplx;
 
-TCplx signal[128];
+TCplx FFT_ComplexBuffer[FFT_LENGHT];
 
-void calbut(TCplx *A, TCplx *B, float sinus, float cosinus) {
-    TCplx C;
-
-    C.re=B->im*sinus + B->re*cosinus;
-    C.im=B->im*cosinus - B->re*sinus;
-    B->re=A->re - C.re;
-    B->im=A->im - C.im;
-    A->re=A->re + C.re;
-    A->im=A->im + C.im;
-}
+uint8_t data[FFT_LENGHT] = {26, 26, 24, 22, 10, 10, 12, 15, 18, 22, 25, 17, 14, 11, 10, 9, 10, 12, 28, 28, 26, 23, 19, 15, 
+12, 15, 18, 22, 25, 26, 27, 25, 9, 9, 10, 12, 15, 18, 22, 20, 15, 12, 10, 8, 8, 9, 27, 28, 26, 
+23, 20, 16, 12, 13, 17, 21, 25, 27, 27, 26, 9, 8, 8, 10, 13, 16, 20, 24, 19, 15, 12, 10, 9, 9, 
+10, 27, 28, 28, 25, 21, 17, 13, 10, 13, 17, 21, 25, 27, 28, 11, 9, 8, 9, 10, 13, 16, 26, 24, 20,
+ 16, 12, 10, 9, 20, 23, 26, 27, 26, 24, 20, 8, 10, 12, 16, 20, 24, 27, 14, 11, 9, 8, 9, 10, 13, 28, 25, 22, 17};
 
 void main() {
     float Fs = 1000.0f;
 
-    // Generate signal + bitswap
+    // Generate FFT_ComplexBuffer + bitswap
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        float temp = 32.0f+12.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i))+20.0f*sin(2.0f*M_PI*450.0f*((1.0f/Fs)*i));
-        signal[bitswap[i]].re = temp;
-        signal[i].im = 0.0f;
+        //float temp = 32.0f+12.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i))+15.0f*sin(2.0f*M_PI*450.0f*((1.0f/Fs)*i));
+        FFT_ComplexBuffer[bitswap[i]].re = data[i];
+        FFT_ComplexBuffer[bitswap[i]].im = 0;
     }
 
     // Round
-    float dsin,dcos;
-    const float *Fnk;
+    int32_t dsin, dcos;
+    const int8_t *Fnk;
     TCplx C;
     TCplx *A,*B;
-    int32_t s,k;
-    int32_t n=1;
-    int32_t angf=N/2;
-    while(n<N)
+    uint8_t s,k;
+    uint8_t n=1;
+    uint8_t angf=FFT_LENGHT/2;
+    while(n<FFT_LENGHT)
     {
-        A=&signal[0];
-        B=&signal[n];     
+        A=&FFT_ComplexBuffer[0];
+        B=&FFT_ComplexBuffer[n];     
         Fnk=TSinCos;
         
         for(k=0;k<n;k++)
@@ -97,8 +84,8 @@ void main() {
             
             for(s=0;s<angf;s++)
             {
-                C.re=B->im*dsin + B->re*dcos;
-                C.im=B->im*dcos - B->re*dsin;
+                C.re=B->im*dsin/64 + B->re*dcos/64;
+                C.im=B->im*dcos/64 - B->re*dsin/64;
                 B->re=A->re - C.re;
                 B->im=A->im - C.im;
                 A->re=A->re + C.re;
@@ -106,8 +93,8 @@ void main() {
                 A+=2*n;
                 B+=2*n;              
             }
-            A-=(N-1);
-            B-=(N-1);             
+            A-=(FFT_LENGHT-1);
+            B-=(FFT_LENGHT-1);             
             Fnk+=(angf-1)*2;
         }        
         n<<=1;
@@ -116,16 +103,15 @@ void main() {
 
     // Abs
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        float a = signal[i].re;
-        float b = signal[i].im;
-        signal[i].re = sqrt(a*a+b*b);
-        signal[i].im = 0.0f;
+        int16_t a = FFT_ComplexBuffer[i].re;
+        int16_t b = FFT_ComplexBuffer[i].im;
+        FFT_ComplexBuffer[i].re = sqrt(a*a+b*b);
+        FFT_ComplexBuffer[i].im = 0;
     }
-    
 
     // Print all
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        printf("%4f\t%4f\n", signal[i].re, signal[i].im);
+        printf("%4d\t%4d\n", FFT_ComplexBuffer[i].re, FFT_ComplexBuffer[i].im);
     }
     
 }
