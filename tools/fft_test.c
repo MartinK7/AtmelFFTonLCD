@@ -71,7 +71,7 @@ void main() {
 
     // Generate signal + bitswap
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        float temp = 32.0f+32.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i));
+        float temp = 32.0f+12.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i))+20.0f*sin(2.0f*M_PI*450.0f*((1.0f/Fs)*i));
         signal[bitswap[i]].re = temp;
         signal[i].im = 0.0f;
     }

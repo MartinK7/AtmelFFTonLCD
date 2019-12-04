@@ -6,6 +6,12 @@
 
 #include <nokialcd.h>
 
+#define __DEBUG__
+
+#ifdef __DEBUG__
+   #include <uart.h>
+#endif
+
 void SPI_MasterTransmit(char data) {
 	/* Start transmission */
 	SPDR = data;
@@ -61,7 +67,8 @@ void LCD_init(void) {
 }
 
 void LCD_setPixel(uint8_t x, uint8_t y) {
-	LCD_pixelBuffer[x + (y>>3)*84] |= _BV(y&0b111);
+   if(x < 84 && y < 48)
+	   LCD_pixelBuffer[x + (y>>3)*84] |= _BV(y&0b111);
 }
 
 void LCD_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
@@ -139,9 +146,22 @@ void LCD_clear(void) {
 }
 
 void LCD_showBuffer(void) {
+#ifdef __DEBUG__
+	for(uint16_t y=0; y<48; ++y) {
+	   for(uint16_t x=0; x<84; ++x) {
+         if(LCD_pixelBuffer[x + (y>>3)*84] & _BV(y&0b111)) {
+            uart_putc('#');
+         } else {
+            uart_putc('.');
+         }
+      }
+      uart_puts("\r\n");
+   }
+#else
 	LCD_command(PCD8544_SETXADDR | 0x00);
 	LCD_command(PCD8544_SETYADDR | 0x00 );
 	for(uint16_t cnt=0; cnt<84*6; ++cnt) {
 		LCD_data(LCD_pixelBuffer[cnt]);
-	}		
+	}
+#endif
 }

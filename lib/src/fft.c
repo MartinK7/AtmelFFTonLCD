@@ -3,7 +3,6 @@
 #include <math.h>
 #include <fft.h>
 
-
 // Swap
 const uint8_t bitswap[FFT_LENGHT] = {
       0,  64,  32,  96,  16,  80,  48, 112,   8,  72, 
@@ -64,12 +63,24 @@ TCplx* FFT_getPtrData() {
     return signal;
 }
 
+void FFT_pushDataSwap(uint8_t value, uint8_t index) {
+    if(index > 127)return;
+    signal[bitswap[index]].re = (int16_t)value;
+    signal[bitswap[index]].im = 0.0f;
+}
+
+void FFT_pushData(uint8_t value, uint8_t index) {
+    if(index > 127)return;
+    signal[index].re = (int16_t)value;
+    signal[index].im = 0.0f;
+}
+
 void FFT_calculate() {
     float Fs = 1000.0f;
 
     // Generate signal + bitswap
     for(uint8_t i=0; i<FFT_LENGHT; ++i) {
-        float temp = 32.0f+32.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i));
+        float temp = 32.0f+12.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i))+20.0f*sin(2.0f*M_PI*450.0f*((1.0f/Fs)*i));
         signal[bitswap[i]].re = (int16_t)temp;
         signal[i].im = 0.0f;
     }
@@ -117,8 +128,5 @@ void FFT_calculate() {
         float a = signal[i].re;
         float b = signal[i].im;
         signal[i].re = sqrt(a*a+b*b);
-        signal[i].im = 0.0f;
     }
-    
-    
 }
