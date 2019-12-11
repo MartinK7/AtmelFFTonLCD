@@ -9,7 +9,6 @@ typedef struct{
 }TCplx;
 
 TCplx FFT_ComplexBuffer[FFT_LENGHT];
-TCplx FFT_ComplexBuffer_2[FFT_LENGHT];
 
 void FFT_calculate();
 
