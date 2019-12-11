@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <uart.h>
 
 #include <fft.h>
 #include <avr/pgmspace.h>
@@ -79,7 +80,7 @@ void FFT_calculate() {
                 A->re=A->re + C.re;
                 A->im=A->im + C.im;
                 A+=2*n;
-                B+=2*n;              
+                B+=2*n;
             }
             A-=(FFT_LENGHT-1);
             B-=(FFT_LENGHT-1);             
@@ -88,6 +89,22 @@ void FFT_calculate() {
         n<<=1;
         angf>>=1;
     }
+
+/*static char text[64];
+
+	uart_puts("Signal after FFT - no sqrt (real part):\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer[i].re);
+		uart_puts(text);
+	}
+
+	uart_puts("\r\n");
+
+	uart_puts("Signal after FFT - no sqrt (imag part) ahoj:\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer[i].im);
+		uart_puts(text);
+	}*/
 
     // Abs
     for(uint32_t i=0; i<FFT_LENGHT; ++i) {

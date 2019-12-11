@@ -1,11 +1,11 @@
-#define DD_SCK    PB5   //        PCINT5    SCK   LED-OUT
-#define DD_MOSI   PB3   // OC2A   PCINT3    MOSI  PWM
-#define DDR_SPI   DDRB
-#define LCD_DDR   DDRB
-#define LCD_PORT  PORTB
-#define LCD_DC    PB0
-#define LCD_CE    PB1
-#define LCD_RST   PB2
+#define DD_SCK    PB5   // ARD_13   PCINT5    SCK   LED-OUT
+#define DD_MOSI   PB3   // ARD_11   OC2A   PCINT3    MOSI  PWM
+#define DDR_SPI   DDRB  // 
+#define LCD_DDR   DDRB  //
+#define LCD_PORT  PORTB //
+#define LCD_DC    PB0   // ARD_8
+#define LCD_CE    PB1   // ARD_9
+#define LCD_RST   PB2   // ARD_10
 
 #define LCDWIDTH 84   ///< LCD is 84 pixels wide
 #define LCDHEIGHT 48  ///< 48 pixels high

@@ -20,8 +20,8 @@ USBPORT   = /dev/ttyUSB0
 
 ## AVR 8-bit toolchain
 # https://www.microchip.com/mplab/avr-support/avr-and-arm-toolchains-c-compilers
-#PREFIX = /usr#/opt/avr8-gnu-toolchain-linux_x86_64
-PREFIX=/home/martin/Downloads/avr8-gnu-toolchain-linux_x86_64
+PREFIX = /usr#/opt/avr8-gnu-toolchain-linux_x86_64
+#PREFIX=/home/martin/Downloads/avr8-gnu-toolchain-linux_x86_64
 
 
 ##

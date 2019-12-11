@@ -27,23 +27,29 @@
 
 uint8_t ADC_bufferIndex = 0;
 
-ISR(ADC_vect) {
-	if(PIND & _BV(PD3)) {
+//ISR(ADC_vect) {
+	/*if(PIND & _BV(PD3)) {
 		FFT_ComplexBuffer[bitswap[ADC_bufferIndex]].re = ADCH>>3;
 		FFT_ComplexBuffer[bitswap[ADC_bufferIndex++]].im = 0;
 	}else{
 		FFT_ComplexBuffer[ADC_bufferIndex].re = ADCH>>3;
 		FFT_ComplexBuffer[ADC_bufferIndex++].im = 0;
-	}
+	}*/
+		/*FFT_ComplexBuffer_2[ADC_bufferIndex].re = ADCH>>3;
+		FFT_ComplexBuffer_2[ADC_bufferIndex].im = 0;
+
+		FFT_ComplexBuffer[bitswap[ADC_bufferIndex]].re = ADCH>>3;
+		FFT_ComplexBuffer[bitswap[ADC_bufferIndex++]].im = 0;
 
 	ADC_bufferIndex &= 0b01111111;
-}
+}*/
 
 void ADC_init() {
-     ADMUX  = 0b01100000;
+     ADMUX  = 0b01100000; //Ref=Vcc, ADLARon
      ADMUX |= 0; //ADCx
-     ADCSRA = _BV(ADLAR) | 7;// 4 or 7
-     ADCSRA |= _BV(ADEN) | _BV(ADIE) | _BV(ADATE); //ADC enable, autotrigger
+     ADCSRA = 7 /*| _BV(ADIE) | _BV(ADATE)*/; //ADC enable, autotrigger
+
+	 ADCSRA |= _BV(ADEN);
 }
 
 void ADC_takeSapmples() {
@@ -68,6 +74,7 @@ void stem(void) {
 /* Function prototypes -----------------------------------------------*/
 int main(void) {
     	uart_init(UART_BAUD_SELECT(115200, F_CPU));
+	sei();
 /*
 	for(uint8_t i=0; i<FFT_LENGHT; ++i) {
 		//float temp = 32.0f+12.0f*sin(2.0f*M_PI*40.0f*((1.0f/Fs)*i))+15.0f*sin(2.0f*M_PI*450.0f*((1.0f/Fs)*i));
@@ -87,17 +94,60 @@ int main(void) {
 	ADC_init();
 	DDRD &= ~(_BV(PD3));
 
-	sei();
-
 	while(1) {
-		ADC_takeSapmples();
+
+	for(uint8_t i=0; i<128; ++i) {
+		/* This starts the conversion. */
+			ADCSRA |= _BV(ADSC);
+
+		// wait
+		while ( (ADCSRA & _BV(ADSC)) );
+
+		FFT_ComplexBuffer_2[i].re = ADCH>>3;
+		FFT_ComplexBuffer_2[i].im = 0;
+
+		FFT_ComplexBuffer[bitswap[i]].re = ADCH>>3;
+		FFT_ComplexBuffer[bitswap[i]].im = 0;
+	}
+
+	/*uart_puts("Recorded signal (real):\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer_2[i].re);
+		uart_puts(text);
+	}
+
+	uart_puts("\r\n");
+
+	uart_puts("Recorded signal  (imag):\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer_2[i].im);
+		uart_puts(text);
+	}
+
+
+	uart_puts("\r\n");
+
+	uart_puts("Signal pre FFT (real part):\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer[i].re);
+		uart_puts(text);
+	}
+
+	uart_puts("\r\n");
+
+	uart_puts("Signal pre FFT (imag part):\r\n");
+	for(uint8_t i=0; i<128; ++i) {
+		sprintf(text, "%4d ", FFT_ComplexBuffer[i].im);
+		uart_puts(text);
+	}*/
+
 
 		// Print all
 		LCD_clear();
 		if(PIND & _BV(PD3)) {
-			uart_puts("FFT START!!!!!\r\n");
+			//uart_puts("FFT START!!!!!\r\n");
 			FFT_calculate();
-			uart_puts("FFT END!!!!!\r\n");
+			//uart_puts("FFT END!!!!!\r\n");
 			stem();
 				
 		}else{
@@ -105,20 +155,29 @@ int main(void) {
 			plot();
 		}
 		LCD_showBuffer();
-/*
-	for(uint8_t i=0; i<128; ++i) {
-		sprintf(text, "%4d\t%4d\r\n", FFT_ComplexBuffer[i].re, FFT_ComplexBuffer[i].im);
-		uart_puts(text);
-	}
-*/
-		_delay_ms(10);
+
+
+		/*uart_puts("Signal after FFT (real part):\r\n");
+		for(uint8_t i=0; i<128; ++i) {
+			sprintf(text, "%4d ", FFT_ComplexBuffer[i].re);
+			uart_puts(text);
+		}
+
+		uart_puts("\r\n");
+
+		uart_puts("Signal after FFT (imag part):\r\n");
+		for(uint8_t i=0; i<128; ++i) {
+			sprintf(text, "%4d ", FFT_ComplexBuffer[i].im);
+			uart_puts(text);
+		}_delay_ms(10);*/
+			
 	}
 
 	while(1);
 
 	//   AND THE ULTIMATE ANSWER IIIISSS !!!
 
-	//  	#   #  ####
+	//  #   #  ####
 	//	#   #     #
 	//	#####  ####
 	//	    #  #
